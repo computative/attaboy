@@ -4,199 +4,37 @@
 \author{\normalsize Marius Jonsson (Institutt for Vanskelig Fysikk, Oscars gate 19, 0352 OSLO, Norway) \\\\
 \vspace{5px}
 \normalsize \texttt{http://github.com/kingoslo/attaboy}}
-\title{\bf \uppercase{Study of the implementation of ode-solvers in the} \textit{n}\uppercase{-body problem posed by a solar system.}}
+\title{\bf \uppercase{TiTlE}}
 \date{\normalsize \today}
 \addbibresource{/home/marius/Dokumenter/MyLibrary.bib}
 \DeclareUnicodeCharacter{2212}{$-$}
 \begin{document}
 \maketitle
-\begin{abstract} \normalsize This is a report submission for the third project of «Computational physics» at the Institute of Physics, University of Oslo, autumn 2016.\\
-\\
-In solving various $n$-body problems, $n \in \mathbb{N}$, using the Forward Euler and Velocity Verlet methods, we found that the stability of the Forward Euler was predictable. Our research show that the behaviour of the Verlet is more complicated. In particular, it was possible to construct scenarios where the error of the Euler was smaller than that of the Verlet. We found however, that in most tests the error of the Verlet is of order steplength squared, whilst the Euler is a first order method. This was justified by the Verlet use of roughly twice the number of FLOPs compared to the Euler, and the runtimes were accordingly. The solution of the $n$-body problems resulted in a formula for the escape velocity of a planet, as well as a formula for the initial velocity giving circular orbit. These formulas were tested numerically. The radial escape velocity of a planet was found to be given by $v_e = (2GM/r)^{1/2}$ and the velocity for circular orbit was $v_0 = \pm(GM/r)^{1/2}$. Next, we saw that the motion of the sun contributes to less than $10^{-4}$ AU alteration of the orbit of the Earth. We also found that the energy and momentum is conserved in a solar system, but that the orbits of planets are not constant, everlasting. We investigated two cases of this. First we measured the impact that Jupiter has on the Earth's orbit. We found that this was approximately $10^{-4}$ AU over the 100 years. Secondly we saw that the Orbit of mercury was altered by its perihelion precession which was 42.52 arcseconds over the course of 100 years. We found that this fits the predictions made by general relativity. Finally, we produced plots of the orbits of all planets in the solar system.
+\begin{abstract} \normalsize This is a report submission for the fourth project of «Computational physics» at the Institute of Physics, University of Oslo, autumn 2016.
 \end{abstract}
 \lstset{
   xleftmargin=.2\textwidth, xrightmargin=.2\textwidth
 }
-\section*{\uppercase{Introduction}}
-The purpose of the project is to explore considerations which arise naturally when one tries to solve $n$-body problems. In particular we want to solve the equations of motions using Newton's law of gravitation, given by
-\begin{equation}
-F = G\frac{Mm}{r^2} \qquad \text{and applying centripetal acceleration} \qquad v^2r = GM. \label{eq:newtonlaw}
-\end{equation}
-In the following we will assume solar mass $M = 1$, time and length are measured in years (yr) and astronomical units (AU) respectively. By equation \ref{eq:newtonlaw}, $G = (2 \pi)^2 \text{AU}^3/\text{yr}^2$ in these units. After discretization we can solve Newton's second law using a variety of solvers. For this project, the majority of the investigation is directed to the so called Velocity Verlet method (after french physicist Loup Verlet), but the classical Forward Euler will be used for comparison.\\
-\\
-In solving the numerical problems we were faced with the questions that naturally arise. We need to solve the equations of motions in a stable but efficient manner. It was therefore natural to explore the behaviour of the solvers in various scenarios, and determine the error, complexity and run times. The Verlet solver did generally have a smaller error than the Euler, but we could produce situations where the reverse was true. It became clear that we could compute the solution to many interesting questions which may be posed by an undergraduate physics students, such as what happens if the size of Jupiter increased by a factor of 1000, or at which velocity one must fire the Earth radially outwards for it to escape the solar system. These findings may be of moderate interest to researchers in computational physics, but we believe that some of the findings we made with the regards to the integrators are controversial and open for more research.
-\\
-\\
-The report is structured by «introduction»-, «methods»-, «results and discussion»- and finally a «conclusion and perspectives»-sections.
-\begin{figure}[!h]
-%\input{outer.pgf} \input{inner.pgf} 
-\caption{Left: Plot of the orbits and planets of the solar system and Ploto. Right: Plot of the sun and the four innermost planets: Mercury, Venus, Earth and Mars, in that order.}\label{fig:solarsystem}
-\end{figure}
-\section*{\uppercase{Methods}}
-Suppose that $x,v$ are functions of time. Suppose the domains $D$ of these functions are compact. then $t_0 = \inf\{t \in D\}$ exists since $D$ is non-empty and bounded since it is compact \parencite[27]{lindstrom_mathematical_2016}. It is then straightforward to implement discretization by partitioning $D$ into exactly $N-1$ subintervals of equal length $h$ by defining $x_i = x(t_0 + i h)$, for all $i$. It is clearly possible to do the same for $v$. Using this prescription, we can integrate Newton second law from basic principles. To see this, write $x$ as a Taylor series and interpret $\dot{x}$ as the velocity, then notice that:
-\begin{equation}
-x_{  i+1} = x_i + h \dot{x}_i + O(h^2) = x_i + h v_i + O(h^2) \label{eq:defeuler}
-\end{equation}
-But this equation depends of $v$, which we know nothing about, so it is natural to find an expression for the velocity in terms of basic principles. Suppose we use Newton's second law, $\dot{v}_i = F_i/m$ $(\dagger)$, then we can analogously derive that:
-\begin{equation}
-v_{  i+1} = v_i + h \dot{v}_i + O(h^2) \stackrel{(\dagger)}{=} v_i + \frac{h}{m}F_i + O(h^2),
-\end{equation}
-which we can use to integrate any $n$-body problem. These are the defining equations of the Forward Euler method, and is conveniently implemented in python by looping:
-\begin{center}
-\begin{lstlisting}
-for i in range(N-1):
-    r[i+1] = r[i] + h*v[i] - (h**2/2)*G*M*r[i]/norm(r[i])**3 
-    v[i+1] = v[i] - G*M*(h/2)*(r[i+1]/norm(r[i+1])**3 + r[i]/norm(r[i]) )
-\end{lstlisting}
-\end{center}
-\begin{figure}[!h]
-%\input{earthsun.pgf} \input{earthjupiter.pgf}
-\caption{Left: Forward Euler i dashed line, Velocity Verlet solid line. Notice tht the error for Forward euler is of order astronomical units already after six months. Right: Solution of 3 body problem consisting of Sun, Earth, Jupiter.}\label{fig:nbody}
-\end{figure}%
-Clearly, these equation carry with them a cumulative error which we will find is $O(h)$, and thus we could be interested in decreasing the error. The alternative method which we will propose requires a little lemma. At first it may seem that this lemma will induce an error which is of the same order as the Euler-solver, but we will soon see that this error becomes unimportant. Write
-\begin{equation}
-\dot{v}_{i+1} = \dot{v}_i + h \ddot{v}_i + O(h^2) \qquad \text{only if}  \qquad h \ddot{v}_i = \dot{v}_{i+1} - \dot{v}_i + O(h^2). \label{eq:ddots}
-\end{equation}
-Using Taylor series we deduce that the position is related to the velocity and acceleration by
-\begin{align}
-x_{  i+1} &= x_i + h \dot{x}_i + \frac{h^2}{2} \ddot{x}_i + O(h^3) = x_i + h v_i + \frac{h^2}{2} \dot{v}_i + O(h^3)
-\label{eq:x+1}
-\end{align}
-But similarly as to the Euler-solver, we clearly need an expression for the velocity in terms of basic principles. This is where the lemma found becomes useful. Write
-\begin{align}
-v_{  i+1} &= v_i + h \dot{v}_i + \frac{h}{2}h \ddot{v}_i + O(h^3) \stackrel{\eqref{eq:ddots}}{=} v_i + h \dot{v}_i + \frac{h}{2}\left(\dot{v}_{i+1} - \dot{v}_i + O(h^2) \right) + O(h^3) \nonumber \\
-& = v_i + \frac{h}{2} 2\dot{v}_i + \frac{h}{2}\left(\dot{v}_{i+1} - \dot{v}_i\right) + \undercbrace{\frac{h}{2}O(h^2)}_{= O(h^3)}  + O(h^3) = v_i + \frac{h}{2}\left(2 \dot{v}_i + \dot{v}_{i+1} - \dot{v}_i\right) + O(h^3) \nonumber \\
-&= v_i + \frac{h}{2}\left(\dot{v}_{i+1} + \dot{v}_i \right) + O(h^3) \label{eq:v+1}
-\end{align}
-By a final step of Newton's second law $(\dagger)$, we can rewrite equations \eqref{eq:x+1} and \eqref{eq:v+1} as
-\begin{equation}
-x_{  i+1} \stackrel{\eqref{eq:x+1}(\dagger)}{=} x_i + h v_i + \frac{h^2}{2m} F_i + O(h^3), \qquad v_{  i+1} \stackrel{\eqref{eq:v+1}(\dagger)}{=} v_i + \frac{h}{2m}\left(F_{i+1} + F_i \right) + O(h^3). \label{eq:defverlet}
-\end{equation}
-These equations are the defining equations for the Velocity Verlet algorithm which we will see that under ideal conditions have an error of $O(h^2)$. They are straightforward to implement by:
-\begin{center}
-\begin{lstlisting}
-for i in range(N-1):
-    r[i+1] = r[i] + h*v[i] - (h**2/2)*G*M*r[i]/norm(r[i])**3
-    v[i+1] = v[i] - G*M*(h/2)*(r[i+1]/norm(r[i+1])**3 + r[i]/norm(r[i]) )
-\end{lstlisting}
-\end{center}
-We can use these to compute a variety of results, including all the results given in the abstract. This is straightforward, but we will require some exact solutions to check our numerics against. For instance, the exact initial velocity which gives a circular orbit for a planet around the Sun. Recall that by the formula for centripetal force, a particle with mass $m$ moving along a circular curvature with radius $r$ we have that
+For a $2 \times 2$-grid of consisting of spin values $\pm 1$, it is straightforward to verify that the partition-function is given by
 \[
-\frac{GMm}{r^2} = F = m\frac{v^2}{r} \qquad \text{only if} \qquad v^2 r = GM.
+Z(\beta) = 12 + 2\left( e^{ -8 J\beta} + e^{ 8 J\beta} \right)
 \]
-in particular for $r = 1$ AU, the initial velocity $v_0$ for circular orbit is constantly equal to $v_0 = (GM)^{1/2} = 2\pi$. Numerically, we verify that this is correct by checking that $\sup |\vec{r}(t)| = \inf| \vec{r}(t)|$ for all times $t$ in one orbit. Analogously we can find the escape velocity of a planet at 1 AU of the Sun. Clearly, a planet is able to escape the Sun if and only if
+and thus the $n$-momentums of energy $E$ and magnetization $M$ are given by
 \[
-\frac{1}{2} mv^2 \geq |U| = \left| - \frac{GM m}{r} \right| = \frac{GM m}{r} \qquad \text{if and only if} \qquad v \geq  \pm \left(\frac{2GM}{r} \right)^{1/2}
-\] 
-In particular for $r = 1$ AU, the escape speed 
-\begin{equation}
-v_e =  \left( 2GM/r \right)^{1/2} = 8^{1/2} \pi \label{eq:escapevel}
-\end{equation}
-It will also be useful to note that the theoretical speed at infinity $v_\infty$ for the planet is related to the null speed $v_0$ and escape speed $v_e$ by
-\begin{equation}
-v_0^2 = v_\infty^2 + v_e^2 \qquad \text{\parencite[40]{bate_fundamentals_1971}}\label{eq:inftyspeed}
-\end{equation}
-\begin{figure}[!h]
-%\input{pathalteration.pgf}
-\caption{Illustration of the effect of jupiters orbit on the path of the earth. Left: Spectrum of the variation in earth-sun distance in the case that the sun is statically placed at the origin. Middle: Spectrum of the variation in earth-sun distance  in the case that the sun is incorporated in the model, balancing the momentum to zero. Right: The spectrum of the variation in Earth-Jupiter distance over 100 years. In all cases we see that the Earth-Jupiter distace is coupled in at the frequency 0.92 yr$^{-1}$, while the global error is located at the frequency 1 yr$^{-1}$, in accordance with the waveform of the global error found in rigure \ref{fig:pUT}.}\label{fig:spectrum}
-\end{figure}%
-If we want to compute the numerical error of a method for which there does not exist an analytical solution, we will need to make an approximation. We will discuss this approximation in the discussion, but for the moment, suppose we are computing an $n$-body problem for a natural number $n \geq 3$. In order to evaluate the solver we are using, we will approximate the exact solution by solving with a small steplength of say $h=10^{-6}$. In the following we will call this an exact solution throughout, although it really isn't.\\
-\\
-To uncover small discrepancies from the classical orbits of our planets, such as the perihelion precession of Mercury, the Newtonian law of gravity is not sufficient. For that purpose it is necessary to derive the first order general relativity-correction to the Newtonian law of gravity. We know that the Schwarzschild metric is a solution of the Einstein equation, given by
-\begin{equation}
-c^2 (\diff \tau)^2 = R c^2 (\diff t)^2 - \frac{(\diff r)^2}{R} - r^2 (\diff \phi)^2, \qquad R \equiv 1 - \frac{2MG}{r c^2}, \label{eq:schwarzschild} \qquad \text{\parencite[175]{hansen_introduction_2013} }
-\end{equation}
-from which it follows that energy for a particle with mass $m$ near the mass $M$ has energy $E$ given by
-\begin{equation}
-\frac{E}{mc^2} = R \dd t; \tau; \qquad \text{if and only if} \qquad (\diff t)^2 = \frac{E^2}{R^2m^2c^4} (\diff \tau)^2 \qquad \text{\parencite[191]{hansen_introduction_2013} } \label{eq:dt2}
-\end{equation}
-To derive the general relativity-correction, we will need to derive an expression for the kinetic energy $T$. We will use that $E^2 = p^2c^2 + m^2 c^4$ $(*)$. Write:
-\begin{equation}
-T = \frac{p^2}{2m} = \frac{1}{2}\left( \frac{p^2}{m}\frac{c^2}{c^2} + 0 \right) = \frac{1}{2}\Bigg( \frac{p^2c^2}{mc^2} + \undercbrace{mc^2 \frac{mc^2}{mc^2} - mc^2}_{=0}\Bigg) \stackrel{(*)}{=} \frac{1}{2}\left( \frac{E^2}{mc^2} - mc^2\right) \label{eq:K}
-\end{equation} 
-Using these, the the rest is an exercise in algebra. We write:
-\begin{align}
-\frac{1}{2} R mc^2 &= \frac{1}{2} R mc^2 \left( \dd \tau ; \tau; \right)^2 = \frac{Rm}{2 (\diff \tau)^2} \left (c^2 (\diff \tau)^2 \right) \stackrel{\eqref{eq:schwarzschild}}{=} \frac{Rm}{2 (\diff \tau)^2} \left ( R c^2 (\diff t)^2 - \frac{(\diff r)^2}{R} - r^2 (\diff \phi)^2 \right) \nonumber \\
-&\stackrel{\eqref{eq:dt2}}{=} \frac{Rm}{2 (\diff \tau)^2} \left ( R c^2 \frac{E^2}{4R^2m^2c^4} (\diff \tau)^2 - \frac{(\diff r)^2}{R} - r^2 (\diff \phi)^2 \right) = \frac{E^2}{2mc^2} - \frac{m}{2} \left( \dd r ; \tau; \right)^2 - \frac{R mr^2}{2} \left( \dd \phi ; \tau; \right)^2 \nonumber \\
-& \stackrel{\eqref{eq:K}}{=} T + \frac{mc^2}{2} - \frac{m}{2} \left( \dd r ; \tau; \right)^2 - \frac{R mr^2}{2} \left( \dd \phi ; \tau; \right)^2
- \label{eq:intermediate}
-\end{align}
-\begin{figure}
-%\input{grcorrection.pgf} \input{grcorrection2.pgf} 
-\caption{Left: Perihelion precession of mercury, classical test of general relativity. One would expect that over 100 years, the perihelion would precess roughly 43'' (arcseconds). We simulated and found 42.53'', in agreement with theory. Right: Same as to the left, however this is the unregressed raw data. We give these for completeness.}\label{fig:grcorrection}
-\end{figure}%
-Recognizing that the rotational- and transflatational energy are $E_\text{rot} = (1/2)m \omega^2 \ (**)$ and $E_\text{tr} = (1/2)m \dot{\vec{r}}^2 \ (***)$ respectively and $l = |\vec{r} \times \vec{v}|$, equation simplifies considerably by using:
-\begin{align}
-T &\stackrel{\eqref{eq:intermediate}}{=} \frac{1}{2}R\left[ mc^2 + mr^2 \left( \dd \phi; \tau; \right)^2 \right] + \undercbrace{\frac{1}{2}m \left( \dd r; \tau; \right)^2}_{=E_\text{tr} \ (***)} - \frac{mc^2}{2} \nonumber \\
-&\stackrel{\eqref{eq:schwarzschild}}{=} \frac{1}{2}\left( 1 - \frac{2MG}{r c^2} \right)\Bigg[ mc^2 + mr^2 \undercbrace{\left( \dd \phi; \tau; \right)^2}_{=\omega^2} \Bigg] + E_\text{tr} - \frac{mc^2}{2} = E_\text{tr} + \undercbrace{\frac{1}{2}mr^2\omega^2}_{=E_\text{rot}} -\;GMm\left( \frac{1}{r} + \frac{l^2}{r^3 c^2} \right)\nonumber\\
-&E_\text{tr} + E_\text{rot} - GMm\left( \frac{1}{r} + \frac{l^2}{r^3 c^2} \right) \label{eq:energy}
-\end{align}
-But then since the only degrees of freedom contributing to the energy are rotations and transflatations, the total energy $E = E_\text{tr} + E_\text{rot} \ (\dagger)$ (there are no vibrations or energy associated with internal spin in our model) and hence since $E = T + U \ (\ddagger)$
-\begin{equation}
-E \stackrel{(\dagger)}{=} E_\text{tr} + E_\text{rot} \stackrel{\eqref{eq:energy}}{=} K + \undercbrace{GMm\left( \frac{1}{r} + \frac{l^2}{r^3 c^2} \right)}_{=U \ (\ddagger)} \quad \text{only if} \quad F = -\dd U;r; = \frac{GMm}{r}\left( \frac{1}{r} + \frac{3l^2}{r^3c^2} \right) \label{eq:SR}
-\end{equation}
-which concludes our derivation. It turns out that this is all that is necessary to derive all the results in the following section.
-
-\section*{\uppercase{Results and discussion}}
-\begin{figure}
-%\input{quantearthsun-a.pgf}\input{quantearthsun-b.pgf}
-\caption{Left: $T/T_0 - 1$ solid line, $U/U_0 - 1$ dashed line, $p/p_0 - 1$ intermediately dashed and dotted. Values of $T_0,U_0,p_0$ were $5.92\cdot 10^{-5}$, $-0.0001$ and $1.89\cdot 10^{-5}$ respectively for Forward Euler. Right: Same quantities solved by Velocity Verlet. Notice that the shape of the momentum is equal to that of the potential energy, indecating that the discrepancy from zero is probably due to numerical error.}\label{fig:pUT}
-\end{figure}
-\begin{table}
-\center
-\begin{tabular}{l c c c c c}
-Iterations & $10^2$        & $10^3$      & $10^4$      & $10^5$     & $10^6$\\ 
-\hline
-Euler [s] &$4.438 \cdot 10^{-3}$ & $4.382\cdot 10^{-2}$ & $0.270\cdot 10^{-1}$ & $2.725\cdot 10^{0}$ & $2.706\cdot 10^{1}$\\
-Verlet [s]  &$1.091\cdot 10^{-2}$ & $1.015\cdot 10^{-1}$ & $7.610\cdot 10^{-1}$ & $6.241\cdot 10^{0}$ & $7.875\cdot 10^{1}$
-\end{tabular}
-\caption{Timing of the Forward Euler and Velocity Verlet algorithms. Iterations are dimensionless and the Euler and Verlet rows are the corresponding times measured in seconds.} \label{tbl:runtimes}
-\end{table}%
-We start by presenting the physical results. We solved various of $n$-body problems. The first was the solution to the two-body problem induced by the Sun and Earth. The sun was fixed at the origin and experienced no gravitational attraction of the Earth. We found that this was a reasonable approximation, probably giving an error smaller than $10^{-4}$ AU over the course of exactly 100 orbits (see figure \ref{fig:spectrum}). We also solved the 3-body problem posed by the Sun, Earth and Jupiter. We simulated both with the sun fixed at the origin as before, but also as a rotating body. The solutions can be found in figure \ref{fig:nbody}. For fun, it is possible to vary the mass of Jupiter to check the impact this has on the trajectory of Earth and Jupiter. We saw that as the mass of Jupiter increased, the trajectory of Earth was thrown off course. Letting the mass of Jupiter be 10 times that of its actual mass, the trajectory of the Earth became noticeably unstable. When the mass of Jupiter was increased to approximately one solar mass, the trajectory of the Earth spiralled inwards to the sun, eventually slingshoting it out of the solar system after exactly four revolutions. We did not include plots of the trajectories of the Earth, but we found that the presence of Jupiter at its correct size has some impact on its orbit, see the spectrum contained in figure \ref{fig:spectrum}. From this plot it is evident that the frequency of the variation of the Earth-Jupiter distance is 0.92 yr$^{-1}$. From the FFTs we found that this frequency is coupled to the spectrum of the variation of Earth orbit. There were also a prominent frequency at 1 yr$^{-1}$. This is the numerical error because the according to figure \ref{fig:pUT}, the error is located at this frequency. The variation in Earth's orbit was amplified by an order of magnitude when we went on to include the Sun's gravitational interaction with the other bodies. Finally we produced the solution to the $10$-body problem of the whole solar system and Pluto. The latter solution is plotted in figure \ref{fig:solarsystem}. \\
-\\
-We checked whether the kinetic energy $T$, the potential energy $U$ and angular momentum (we equivalently checked that momentum was conserved) was conserved. We found that the variations in these were smaller than approximately $10^{-7}$ for the Verlet algorithm, and $10^{-3}$ for Forward Euler. We found that the waveform of these quantities was similar to the waveform of the global errors of both methods. Se figure \ref{fig:pUT}. We also saw by trail and error that the escape velocity for a planet is given by $v_e = (2GM/r)^{1/2}$. This was in accordance with equation \eqref{eq:escapevel}. We verified that for our choice of units this value was exactly $8^{1/2}\pi$. See the right hand side of figure \ref{fig:escape} for an illustration of the result.\\
-\\
-We eventually implemented the correction due to general relativity. We solved the two-body problem posed by the Sun and Mercury. It can he shown that the perihelion of Mercury will precess as a function of time. We found that over the course of 100 years, this precession was 42.53'' (arcseconds). We produced a table and plots of the precession, which we found to be linear. See table \ref{tbl:grcorrection} and figure \ref{fig:grcorrection} for more details.
-\\
-\\
-The solvers were tested and we made several findings. In addressing the stability of the solvers, we found that the Forward Euler, although testing was limited, was predictable. It's global error was found to be $O(h)$, and seemed unaffected by some of the things which the Verlet was affected by (fig \ref{fig:stableearthsun}). For the Verlet however, things were more complicated. We found that the cumulative error of the algorithm was $O(h^2)$ at best. This was obtained when we simulated the Earth orbiting a static sun at the origin for one revolution. Once we tested the Verlet's stability over numerous revolutions, we found that the relationship between the step length and error varied: For a 100 revolution simulation of the Earth, the error was similar between the Verlet and Euler, but for all steplengths smaller than $10^{-1}$ the Verlet error would scale as $O(h^2)$ (fig \ref{fig:stableearthsun}). Finally, the stability was measured for the orbit of the Earth in presence of the super massive Jupiter. We found that the error of the Verlet was correlated to the number of higher order derivatives of the ODE. In the case where the higher order derivatives vanished (as in the case of the stable earth-sun situation), the error scaled as predicted above. However, as the number of derivatives of the integrable function increased, we found that for some reduction of steplengths, the error actually increased somewhat. This was naturally largest when the mass of Jupiter was 1000 times it's actual mass. But for all sizes of Jupiter, we found that the error dropped most rapidly at large steplengths. See figure \ref{fig:escape}. In this case, it is not fair to give an estimate on the order of the error because it was itself a function of the steplength. Overall, the Verlet was less predictable, but seemed to converge at variable rate to the exact solution.\\
-\\
-In regards to the complexity of the solvers we found that the Velocity Verlet requires roughly twice the number of floating point operations of the Forward Euler, while the exact number of FLOPs where directly proportional to the number of dimensions. This was reflected in the timings which were made. Overall we found that the run times of the Verlet was almost consistently twice the that of the Euler. See table \ref{tbl:runtimes}. This is in accordance with the ratio of FLOPs of the Verlet compared to the Euler. We were not able to decouple the spatial and velocity dependent parts of the defining equations. However, we found that the columns of the solution matrices were linearly independent. In the discussion we will suggest that this could induce additional efficiency gains for the Velocity Verlet.\\
-\\
-\begin{figure}
-%\input{stableearthsun-1.pgf}\input{stableearthsun-100.pgf}
-\caption{Left: An upper bound on the error after one revolution of the earth. It is given by the difference between the numerical solution $\vec{r}(t)$ and the exact solution $\vec{s}$ projected onto $\vec{r}$. We let $\|\cdot\|_\infty$ denote the supremum norm on the space on all three dimensional, real $n$-tuples. Right: An upper bound on the error after 100 revolutions of the earth.}\label{fig:stableearthsun}
-\end{figure}
-
-\begin{table}
-\center
-\begin{tabular}{l l l l l l}
-Time [years]& 0        & 25      & 50      & 75     & 100\\ 
-\hline
-Precession &-3.01''   &14.37''  &19.76''  &25.15'' & 42.53''
-\end{tabular}
-\caption{Our finding for the precession of Mercury perihelion. We found that there is a rotation of approximately 43 arcseconds over 100 years.} \label{tbl:grcorrection}
-\end{table}
-We will proceed to discuss our results in the order they were introduced, thus we will discuss our physics results first. We saw that it is reasonable to solve the $n$-body problems by letting the Sun be stationary at the origin rather than including the effects of gravitational interaction on its path. As we saw, the upper bound on the error was $10^{-4}$. We obtained this estimate by measuring the alteration caused by Jupiter, as per figure \ref{fig:spectrum}. And at this scale, the effect of the sun was not even present in the spectrum. One may argue however that the effect of the sun is present in the signal we found at the frequency 1 yr$^{-1}$, especially as this varied between the cases of static and non-static sun. But as we saw, even in taking this into consideration, the effect is of order $10^{-4}$. Interestingly we saw that the contribution at frequency 0.92 yr$^{-1}$ (represented by the alteration of the path of the Earth due to Jupiter) was an order of magnitude larger in the case that the sun was non-static. This may be due to its changing momentum periodically altering the paths of the planets. If this is the case, it should be straight forward to confirm this by computation, but we did not proceed to verify this. Hence it is still unclear exactly which mechanism that amplifies the effect due to the Earth-Jupiter interaction.\\
-\\
-Next we saw that the angular momentum, potential-, kinetic energies were not precisely constant. However, because we saw that the the waveforms of the variations were the same as the waveforms of the errors for both methods (Euler and Verlet), it is almost certain that the variations we saw were induced by the global error. Furthermore, for the Verlet algorithm these variations were order $10^{-7}$. This is constant for all practical purposes, and we would like to conclude that these quantities are conserved in the physical sense. This should be the case because the law of conservation of energy, states that the energy of an isolated system remains constant. And because the radius is constant, the potential energy must be constant, and so for the kinetic energy. But the kinetic energy is constant if and only if the momentum is constant. We also saw that the waveform of the momentum is equal to the waveform of the potential energy. This may seem surprising since the spatial effect enters the potential energy in the dominator, while the momentum is proportional to the velocity. We would like to suggest without proof that this is probably because the variations were sinusoidal, and the magnitude of the derivatives $\dd^{2n};t;$ of a sinusoidal function coincides with itself for all $n$. We were also able to confirm that the exact results we found for the escape velocity and initial velocity inducing circular orbits were correct.\\
-\\
-Lastly, we saw that the regressed correction due to general relativity on the precession of the perihelion of Mercury followed what one finds in observation. We saw however, that the raw data itself was not smooth. Instead, there were 10'' amplitude spikes which varied with time. We were not able to determine whether these were due to general relativity itself, or induced otherwise, as perhaps as systematic computational error. It may be worth noting however, that the correction due to relativity were only implemented to first order. In the derivation of the energy \eqref{eq:dt2}, which we didn't show, one truncates all the higher order terms in a Taylor series to obtain an affine equation. It could be, although probably unlikely, that we are seeing this effect in the raw data. We suggest that this is unlikely because the equations of motion itself would produce an infinitely differentiable solution (as it is actually a power series), and therefore it should produce infinitely differentiable antiderivatives with respect to all variables \parencite[86]{lindstrom_mathematical_2016}. Therefore this is probably some effect of our computation. But since the regressed data fits observations, we would like to conclude that it seems that Mercury perihelion precession may be explained by general relativity. More research into the waveform in the raw data is appropriate.\\
-\\
-\begin{figure}
-%\input{unstablejupiter.pgf} \input{escapevelocity.pgf}
-\caption{Left: Upper bound on the error after a few revolutions of the earth for Jupiter included in the model. The three traces represents the error when we vary the size of jupiter to make the orbit of the Earth gradually more unstable. The first trace represents a mass of 1 jupiter mass, whilst the last represents 1000 jupiter-masses. Right: Progessively aproximating the escape velocity by gradually approximating the velocity at inifinity by repeated simulations for various null speeds $v_0$. For $v_0 = 8^{1/2} \pi$, we find the escape speed $v_e = \left( v_0^2 - \|v\|_\infty^2 \right)^{1/2} = (2GM/r)^{1/2}$, in accordance with equation \ref{eq:inftyspeed}. Our numerics fit the analytics precisely.}\label{fig:escape}
-\end{figure}%
-We found that the stability of the Euler-solver was predictable. But testing was limited to exactly 2 trails. This may not be much, but it is sufficient because \cite[358]{morken_numerical_2013} has proved that if the solution is bounded, continuous on all compact intervals, the Euler-solver has a global error $O(h)$, which is exactly what we saw. One could be surprised that even though the defining equation of the Euler (equation \ref{eq:defeuler}) alone induce and error $O(h^2)$, that the global error is one order worse, but this is due to cumulative effects. Analogously, we may be surprised to find that the error of the Verlet was $O(h^2)$ at best even though its defining equations induce an error of $O(h^3)$ at each integration point. It may be surprising that we found the error of the Verlet to be as strongly dependent on the step lengths. For some functions and intervals of $h$, we found the error varied between $O(1)$, and $O(h^3)$ suspiciously. One could question that this behaviour is due to the way the numbers were estimated rather than the method itself. This is particularly true for the stability study which was carried out for the unstable earth in the 3-body problem. As we noted, there were no exact solution available for this case. The best we could do was to estimate the exact solution. This was done by first solving using the Verlet method itself. This is a crucial step, as we shall now see. It is possible to complain that this renders the analysis useless, but we would like to argue that since the estimate to the exact solution was carried out by the solver in question, a failure to converge to the numerical solution implies that the numerical solution in general does not converge for that step length. This may probably be formalized using sequences of functions, and by picking a subsequence that does not converge. From mathematical analysis, we know that this means that the sequence of functions itself necessarily does not converge \parencite[61]{lindstrom_mathematical_2016}, and thus our approach may be made rigorous. Furthermore, since the set of higher order derivatives of a function determines the function by the Fundamental theorem of Analysis, we conclude that the convergence of the Verlet is determined by its derivatives. Even though this is theoretically sound, it may be appropriate to check the actual implementation at program level is correct. The result seems so controversial at first (since it proves that the Euler has smaller error for some application, for example) that it is appropriate to have it checked thoroughly.\\
-\\
-Finally, we would like to address what was said about increasing the efficiency of the Verlet solver. We found that the solution matrices $\vec{r}$ and $\vec{v}$ were linearly independent for all our cases. If this can be shown in general, then there exist a singular value decomposition of full rank \parencite[417]{lay_linear_2012} decoupling the spatial and velocity from the defining equations of the Verlet algorithm. It may therefore be possible to deduce faster linear algebra methods than the iterative scheme that is implemented. Furthermore, since linear algebra is so well understood, this could allow prosperous perspectives for understanding the behaviour of the Verlet algorithm.
-
-\section*{\uppercase{Conclusions and perspectives}}
-Our main findings were that the error of the Verlet solver appeared to be dependent on the derivatives of the solution of the $n$-body problem at hand. The Verlet alogirthm was stable in the sense that it did not diverge in any of the tests. However when the error was plotted against steplength $h$, there were intervals in $h$ where the error was reduced more slowly than that of the Euler. Although under what we called ideal circumstances, the error was constantly an order better than the Euler. We were also able to quantify the effect that the presence of Jupiter has on the orbit of the Earth, and present the orbits of the planets in the solar system and Pluto. Finally, we saw that it is plausible that the theory of general relativity can explain the perihelion precession of Mercury.\\
-\\
-There are prospects for more work which may be fruitful. Algebraically inclined researchers may find it interesting to proceed to show that the solution matrix of the Verlet has linearly independent columns, then attempt to decouple the dependence of the velocity and position and attempt to use linear algebra methods to discover a faster way to solve the defining equations. Numerically inclined researchers, on the other hand, may want to examine the error of the Verlet against the number- or magnitude of higher order derivatives. This is probably a more direct procedure to learn about the stability of the algorithm than our heuristic approach. Because we want to solve the equations of motions efficiently, it is useful to research the limitations of the Verlet solver. Therefore, more research in this area is rational.\\
-\\
-In closing, we're asked to give constructive criticism to the course administration regarding the organization of project 3. At the time of writing, the authors believe that the design and execution of project 3 was beneficial to almost all students, and we have no further comments at this time. This concludes our report for project 3.
-
+\E{E^n}(\beta) = \frac{2}{Z}\left( 8^n e^{ -8 J\beta} + (-8)^n e^{ 8 J\beta}  \right), \quad \E{M^n}(\beta) = \frac{1}{Z}\left( 4^n e^{ -8 J\beta} + 4(2)^n + 4(-2)^n + (-4)^n e^{ 8 J\beta}  \right)
+\]
+respectively. Use these, it is straight forward to compute the heat capacity at constant volume and magnetic susceptibility since these are proportional to the variance of $E$ and $M$. They are
+\begin{align*}
+C_V &= \frac{1}{kT^2}\sigma_E^2 = \frac{128}{ZkT^2}\left( e^{ -8 J\beta} + e^{ 8J\beta}
+-
+\left(e^{ -8 J\beta} - e^{ 8 J\beta}\right)^2 \right) = \frac{2^8}{ZkT^2}\left(  \cosh 8 J\beta
+-
+2 \sinh^2 8 J\beta \right) \\
+\chi &= \frac{1}{kT} \sigma_M^2 = \frac{16}{ZkT} \left( e^{ -8 J\beta} + 2 + e^{ 8 J\beta} - \left( e^{ -8 J\beta} - e^{ 8 J\beta} \right)^2 \right) = \frac{2^5}{ZkT}\left( 1 + \cosh 8 J\beta - 2 \sinh^2 8 J\beta \right)
+\end{align*}
+It remains to obtain the expressions for expected energy and mean magnitude of magnetization and expectation they are obtained from the momentum of the associated quantities:
+\[
+\E{E}(\beta) = \frac{2^4}{Z}\left( e^{ -8 J\beta} + e^{ 8 J\beta}  \right) \qquad \text{and} \qquad \E{|M|}(J\beta) = \frac{2^2}{Z}\left(  e^{ -8 J\beta} + 4 +  e^{ 8 J\beta} \right).
+\]
 \printbibliography
 \end{document}
