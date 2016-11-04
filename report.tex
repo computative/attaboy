@@ -21,20 +21,16 @@ Z(\beta) = 12 + 2\left( e^{ -8 J\beta} + e^{ 8 J\beta} \right)
 \]
 and thus the $n$-momentums of energy $E$ and magnetization $M$ are given by
 \[
-\E{E^n}(\beta) = \frac{2}{Z}\left( 8^n e^{ -8 J\beta} + (-8)^n e^{ 8 J\beta}  \right), \quad \E{M^n}(\beta) = \frac{1}{Z}\left( 4^n e^{ -8 J\beta} + 4(2)^n + 4(-2)^n + (-4)^n e^{ 8 J\beta}  \right)
+\E{E^n}(\beta) = \frac{2}{Z}\left( 8^n e^{ -8 J\beta} + (-8)^n e^{ 8 J\beta}  \right), \quad \E{M^n}(\beta) = \frac{1}{Z}\left( 4^n e^{ 8 J\beta} + 4(2)^n + 4(-2)^n + (-4)^n e^{ 8 J\beta}  \right)
 \]
 respectively. Use these, it is straight forward to compute the heat capacity at constant volume and magnetic susceptibility since these are proportional to the variance of $E$ and $M$. They are
 \begin{align*}
-C_V &= \frac{1}{kT^2}\sigma_E^2 = \frac{128}{ZkT^2}\left( e^{ -8 J\beta} + e^{ 8J\beta}
--
-\left(e^{ -8 J\beta} - e^{ 8 J\beta}\right)^2 \right) = \frac{2^8}{ZkT^2}\left(  \cosh 8 J\beta
--
-2 \sinh^2 8 J\beta \right) \\
-\chi &= \frac{1}{kT} \sigma_M^2 = \frac{16}{ZkT} \left( e^{ -8 J\beta} + 2 + e^{ 8 J\beta} - \left( e^{ -8 J\beta} - e^{ 8 J\beta} \right)^2 \right) = \frac{2^5}{ZkT}\left( 1 + \cosh 8 J\beta - 2 \sinh^2 8 J\beta \right)
+C_V &= \frac{1}{kT^2}\sigma_E^2 = \frac{2^6}{kT^2}\left(  \frac{2}{Z}\left( e^{ -8J\beta} + e^{ 8J\beta} \right) - \frac{2^2}{Z^2}\left( e^{ -8J\beta} - e^{ 8J\beta} \right)^2  \right) \\
+\chi &= \frac{1}{kT} \sigma_M^2 = \frac{16}{ZkT} \left( 2e^{ -8 J\beta} + 2 - \left( 0 \right)^2 \right) = \frac{2^5}{ZkT}\left( 1 + e^{ -8j\beta} \right)
 \end{align*}
 It remains to obtain the expressions for expected energy and mean magnitude of magnetization and expectation they are obtained from the momentum of the associated quantities:
 \[
-\E{E}(\beta) = \frac{2^4}{Z}\left( e^{ -8 J\beta} + e^{ 8 J\beta}  \right) \qquad \text{and} \qquad \E{|M|}(J\beta) = \frac{2^2}{Z}\left(  e^{ -8 J\beta} + 4 +  e^{ 8 J\beta} \right).
+\E{E}(\beta) = \frac{2^4}{Z}\left( e^{ -8 J\beta} - e^{ 8 J\beta}  \right) \qquad \text{and} \qquad \E{|M|}(J\beta) = \frac{2^3}{Z}\left(  2 + e^{ -8 J\beta} \right).
 \]
 \printbibliography
 \end{document}

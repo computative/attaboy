@@ -1,0 +1,56 @@
+from numpy import *
+from numpy.random import *
+from numpy.linalg import *
+import copy
+
+"""
+def S(M):
+    s = 0
+    for i in range(m-1):
+        s += M[i,n-1]*M[i,0] + M[i,n-1]*M[i+1,n-1]
+        for j in range(n-1):
+            s += M[i,j]*M[i,j+1] + M[i,j]*M[i+1,j]
+    for j in range (n-1):    
+        s += M[m-1,j]*M[m-1,j+1] + M[m-1,j]*M[0,j]
+    s  +=  M[m-1,n-1]*M[0,n-1] + M[m-1,n-1]*M[m-1,0]
+    return -s
+"""
+def S(M):
+    s = 0
+    for i in range(m):
+        for j in range(n):
+            s += M[i,j]*M[i,(j+1) % (n)] + M[i,j]*M[(i+1) % (m),j]
+    return -s
+
+m,n = 2,2
+M = 2.*randint(0,2,size=(m,n))-1.
+o = 100000
+beta = 1
+ener = 0
+ener2 = 0
+absmagn = 0
+magn = 0
+magn2 = 0
+
+for k in range(o):
+    for i in range(m):
+        for j in range(n):
+            u = randint(0,m)
+            v = randint(0,n)
+            N = copy.deepcopy(M)
+            N[u,v] = - N[u,v]
+            if exp( -beta*(S(N) - S(M)) ) > rand():
+                M[u,v] = N[u,v]
+                #M[i,j] = N[i,j]
+    
+    ener += S(M)
+    ener2 += S(M)**2
+    magn += sum(M)
+    absmagn += abs(sum(M))
+    magn2 += sum(M)**2
+
+
+print "Energy:", ener/o
+print "Magn:",   absmagn/o
+print "Cv:",     ener2/o - (ener/o)**2
+print "X:",      magn2/o - (absmagn/o)**2
