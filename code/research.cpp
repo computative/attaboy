@@ -37,19 +37,13 @@ int sum(double **A, int &m, int &n) {
 
 int main(int argc, char *argv[])
 {
-    /*int m = atoi(argv[1]);
-    int n = atoi(argv[2]);
-    int N = atoi(argv[3]);
-    int mode = atoi(argv[4]);
-    double beta = atoi(argv[5]);
-    int A0 = atoi(argv[6]);*/
+    int N = atoi(argv[1]);
+    double beta = atof(argv[2]);
+    int A0 = atoi(argv[3]);
+    int mode = 1;
 
     int m = 20;
     int n = 20;
-    int A0 = 1; // 1 indicates ordered matrix
-    int mode = 0; // 0 writes no data to disk
-    int N = 10000;
-    double beta = 1;
 
     random_device rd;
     mt19937 gen(rd());
@@ -57,6 +51,7 @@ int main(int argc, char *argv[])
     uniform_int_distribution<int> rand_n(0, n-1);
     uniform_int_distribution<int> rand_bool(0, 1);
     uniform_real_distribution<double> randouble(0.0,1.0);
+
     int a;
     double ** A = new double*[m];
     for (int i = 0; i < m; i++) {
@@ -75,6 +70,7 @@ int main(int argc, char *argv[])
     double ** data  = new double* [N];
     double time = omp_get_wtime();
     for (int k = 0; k < N; k++) {
+        int accepts = 0;
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
                 int u = rand_m(gen);
@@ -85,12 +81,15 @@ int main(int argc, char *argv[])
                     A[u][v] = - A[u][v];
                     E += dE;
                     M += 2*A[u][v];
+                    accepts++;
                 }
             }
         }
-        data[k] = new double [2];
+        data[k] = new double [3];
         data[k][0] = E;
         data[k][1] = M;
+        data[k][2] = accepts;
+
         avg[0] += E;
         avg[1] += E*E;
         avg[2] += abs(M);
@@ -100,10 +99,9 @@ int main(int argc, char *argv[])
         ofstream outfile;
         outfile.open("temp.txt");
         for(int k = 0; k < N; k++)
-            outfile << data[k][0] << ' ' << data[k][1] << endl;
+            outfile << data[k][0] << ' ' << data[k][1] << ' ' << data[k][2] << endl;
         outfile.close();
     }
     delete [] data;
-    cout << omp_get_wtime() - time << endl<< endl;
-    cout << avg[0]/N << ' ' << avg[2]/N << ' '<< avg[1]/N - pow(avg[0]/N,2) << ' ' << avg[3]/N - pow(avg[2]/N,2)<< endl;
+    cout << omp_get_wtime() - time << endl;
 }
