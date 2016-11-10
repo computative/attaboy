@@ -2,7 +2,7 @@ data7 = read.table("data7.txt")
 data2 = read.table("data2.txt")
 data = read.table("data.txt")
 data = rbind(data2,data,data7)
-data = read.table("researchdata.txt")
+data = read.table("bigmatrixdata.txt")
 
 
 #j beta 1,2.4  k matrix 0,1
@@ -19,7 +19,6 @@ plot(data$V1,data$V4 ,log="x")
 
 # T = 1, random matrix
 # E
-
 plot(data$V5,data$V6 ,log="x")
 # M
 plot(data$V5,data$V7 ,log="x")
@@ -28,6 +27,7 @@ plot(data$V5,data$V8 ,log="x")
 
 # T = 2.4, ordered matrix
 # E
+
 plot(data$V9,data$V10 ,log="x")
 # M
 plot(data$V9,data$V11 ,log="x")

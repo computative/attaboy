@@ -14,7 +14,7 @@ CC            = gcc
 CXX           = g++
 DEFINES       = -DQT_QML_DEBUG
 CFLAGS        = -pipe -g -Wall -W -fPIC $(DEFINES)
-CXXFLAGS      = -pipe -g -std=gnu++11 -Wall -W -fPIC $(DEFINES)
+CXXFLAGS      = -pipe -fopenmp -g -std=gnu++11 -Wall -W -fPIC $(DEFINES)
 INCPATH       = -I../attaboy -I. -I../../../../Qt/5.7/gcc_64/mkspecs/linux-g++
 QMAKE         = /home/marius/Qt/5.7/gcc_64/bin/qmake
 DEL_FILE      = rm -f
@@ -36,7 +36,7 @@ DISTNAME      = attaboy1.0.0
 DISTDIR = /home/marius/Dokumenter/fys4150/attaboy/build-attaboy-Desktop_Qt_5_7_0_GCC_64bit-Debug/.tmp/attaboy1.0.0
 LINK          = g++
 LFLAGS        = 
-LIBS          = $(SUBLIBS)  
+LIBS          = $(SUBLIBS) -fopenmp 
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -183,6 +183,7 @@ DIST          = ../../../../Qt/5.7/gcc_64/mkspecs/features/spec_pre.prf \
 		../../../../Qt/5.7/gcc_64/mkspecs/features/qt_config.prf \
 		../../../../Qt/5.7/gcc_64/mkspecs/linux-g++/qmake.conf \
 		../../../../Qt/5.7/gcc_64/mkspecs/features/spec_post.prf \
+		../attaboy/.qmake.stash \
 		../../../../Qt/5.7/gcc_64/mkspecs/features/exclusive_builds.prf \
 		../../../../Qt/5.7/gcc_64/mkspecs/features/default_pre.prf \
 		../../../../Qt/5.7/gcc_64/mkspecs/features/resolve_config.prf \
@@ -339,6 +340,7 @@ Makefile: ../attaboy/attaboy.pro ../../../../Qt/5.7/gcc_64/mkspecs/linux-g++/qma
 		../../../../Qt/5.7/gcc_64/mkspecs/features/qt_config.prf \
 		../../../../Qt/5.7/gcc_64/mkspecs/linux-g++/qmake.conf \
 		../../../../Qt/5.7/gcc_64/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		../../../../Qt/5.7/gcc_64/mkspecs/features/exclusive_builds.prf \
 		../../../../Qt/5.7/gcc_64/mkspecs/features/default_pre.prf \
 		../../../../Qt/5.7/gcc_64/mkspecs/features/resolve_config.prf \
@@ -485,6 +487,7 @@ Makefile: ../attaboy/attaboy.pro ../../../../Qt/5.7/gcc_64/mkspecs/linux-g++/qma
 ../../../../Qt/5.7/gcc_64/mkspecs/features/qt_config.prf:
 ../../../../Qt/5.7/gcc_64/mkspecs/linux-g++/qmake.conf:
 ../../../../Qt/5.7/gcc_64/mkspecs/features/spec_post.prf:
+.qmake.stash:
 ../../../../Qt/5.7/gcc_64/mkspecs/features/exclusive_builds.prf:
 ../../../../Qt/5.7/gcc_64/mkspecs/features/default_pre.prf:
 ../../../../Qt/5.7/gcc_64/mkspecs/features/resolve_config.prf:

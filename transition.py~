@@ -1,0 +1,8 @@
+from numpy import *
+from os import popen
+dt = 0.05
+N = int(10**5)
+n = 8
+
+A = popen("/home/marius/Dokumenter/fys4150/attaboy/build-attaboy-Desktop_Qt_5_7_0_GCC_64bit-Release/attaboy %f %i %i" % (dt,N,n) )
+print A.readlines()

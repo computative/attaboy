@@ -37,76 +37,71 @@ int sum(double **A, int &m, int &n) {
 
 int main(int argc, char *argv[])
 {
-    int N = atoi(argv[1]);
-    double beta = atof(argv[2]);
-    int A0 = atoi(argv[3]);
-    //int A0 = 1; // 1 indicates ordered matrix
+
+    double dt = atof(argv[1]);
+    int N = atoi(argv[2]);
+    int n = atoi(argv[3]);
+
+    //double dt = 0.05;
     //int N = 100000;
-    //double beta = 1/2.4;
-    int mode = 1;
+    //int n = 20;
 
-    int m = 140;
-    int n = 140;
-
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<int> rand_m(0, m-1);
-    uniform_int_distribution<int> rand_n(0, n-1);
-    uniform_int_distribution<int> rand_bool(0, 1);
-    uniform_real_distribution<double> randouble(0.0,1.0);
-
-    int a;
-    double ** A = new double*[m];
-    for (int i = 0; i < m; i++) {
-        A[i] = new double [n];
-        for (int j = 0; j < n; j++) {
-            a = 1;
-            if (A0)
-                a = 2*rand_bool(gen) - 1;
-            A[i][j] = a;
-        }
+    int m = n;
+    int timesteps = (int) ceil(0.3/dt);
+    int samplepoint = 10000;
+    double * beta = new double [timesteps];
+    for (int i = 0; i < timesteps; i++) {
+        beta[i] = 1/(2 + (i+1)*dt);
     }
 
-    double E = S(A,m,n);
-    double M = sum(A,m,n);
-    double avg [4] = {0,0,0,0};
-    double ** data  = new double* [N];
-    double time = omp_get_wtime();
-    for (int k = 0; k < N; k++) {
-        int accepts = 0;
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                int u = rand_m(gen);
-                int v = rand_n(gen);
-                double dE = 2*(A[u][v]*A[u][mod(v+1,n)] + A[u][v]*A[mod(u+1, m)][v] +
-                        A[u][v]*A[u][mod(v-1 , n)] + A[u][v]*A[mod(u-1 , m)][v]);
-                if (exp(-beta*dE) > randouble(gen) ) {
-                    A[u][v] = - A[u][v];
-                    E += dE;
-                    M += 2*A[u][v];
-                    accepts++;
+    # pragma omp parallel
+    {
+        int id = omp_get_thread_num();
+        int threads = omp_get_num_threads();
+        for (int l = id; l < timesteps; l=l+threads) {
+            random_device rd;
+            mt19937 gen(rd());
+            uniform_int_distribution<int> rand_m(0, m-1);
+            uniform_int_distribution<int> rand_n(0, n-1);
+            uniform_int_distribution<int> rand_bool(0, 1);
+            uniform_real_distribution<double> randouble(0.0,1.0);
+
+            double ** A = new double*[m];
+            for (int i = 0; i < m; i++) {
+                A[i] = new double [n];
+                for (int j = 0; j < n; j++) {
+                    A[i][j] = 2*rand_bool(gen) - 1;
                 }
             }
-        }
-        data[k] = new double [3];
-        data[k][0] = E;
-        data[k][1] = M;
-        data[k][2] = accepts;
 
-        avg[0] += E;
-        avg[1] += E*E;
-        avg[2] += abs(M);
-        avg[3] += M*M;
+            double E = S(A,m,n);
+            double M = sum(A,m,n);
+            double avg [4] = {0, 0, 0, 0};
+            double time = omp_get_wtime();
+            for (int k = 0; k < N; k++) {
+                for (int i = 0; i < m; i++) {
+                    for (int j = 0; j < n; j++) {
+                        int u = rand_m(gen);
+                        int v = rand_n(gen);
+                        double dE = 2*(A[u][v]*A[u][mod(v+1,n)] + A[u][v]*A[mod(u+1, m)][v] +
+                                A[u][v]*A[u][mod(v-1 , n)] + A[u][v]*A[mod(u-1 , m)][v]);
+                        if (exp(-beta[l]*dE) > randouble(gen) ) {
+                            A[u][v] = - A[u][v];
+                            E += dE;
+                            M += 2*A[u][v];
+                        }
+                    }
+                }
+                if (k >= samplepoint) {
+                    avg[0] += E;
+                    avg[1] += E*E;
+                    avg[2] += abs(M);
+                    avg[3] += M*M;
+                }
+            }
+            delete [] A;
+            # pragma omp critical
+            cout << 1/beta[l] << ' ' << omp_get_wtime() - time << ' ' << avg[0]/(N - samplepoint) << ' ' << avg[2]/(N - samplepoint) << ' '<< (avg[1]/(N - samplepoint) - pow(avg[0]/(N - samplepoint),2))*beta[l]*beta[l] << ' ' << (avg[3]/(N - samplepoint) - pow(avg[2]/(N - samplepoint),2))*beta[l] << ' ' <<  endl;
+        }
     }
-    if (mode) {
-        ofstream outfile;
-        outfile.open("temp.txt");
-        for(int k = 0; k < N; k++)
-            outfile << data[k][0] << ' ' << data[k][1] << ' ' << data[k][2] << endl;
-        outfile.close();
-    }
-    delete [] data;
-    cout << omp_get_wtime() - time << endl<< endl;
-    cout << avg[0]/N << ' ' << avg[2]/N << ' '<< avg[1]/N - pow(avg[0]/N,2) << ' ' << avg[3]/N - pow(avg[2]/N,2)<< endl<<endl;
-    cout << N << " " << beta << " " << A0 << endl;
 }
