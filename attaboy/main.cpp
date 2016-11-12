@@ -37,30 +37,33 @@ int sum(double **A, int &m, int &n) {
 
 int main(int argc, char *argv[])
 {
-
-    double dt = atof(argv[1]);
+    double T = atof(argv[1]);
     int N = atoi(argv[2]);
     int n = atoi(argv[3]);
+    int samples = atoi(argv[4]);
+    int thd = 8;
 
-    //double dt = 0.05;
-    //int N = 100000;
-    //int n = 20;
-
+    /*double T = 2.2;
+    int N = 10000;
+    int n = 20;
+    int samples = 10;
+    int thd = 1;
+*/
+    double mini = 1;
+    double maxi = log10(N)*log(10);
+    double ds = (maxi - mini)/samples;
     int m = n;
-    int timesteps = (int) ceil(0.3/dt);
-    int samplepoint = 10000;
-    double * beta = new double [timesteps];
-    for (int i = 0; i < timesteps; i++) {
-        beta[i] = 1/(2 + (i+1)*dt);
-    }
+    double beta = 1/T;
 
-    # pragma omp parallel
+    # pragma omp parallel num_threads(thd)
     {
-        int id = omp_get_thread_num();
-        int threads = omp_get_num_threads();
-        for (int l = id; l < timesteps; l=l+threads) {
+            ofstream outfile;
             random_device rd;
             mt19937 gen(rd());
+            uniform_int_distribution<int> randnum(0, 100000000);
+            outfile.open("file_" + to_string(n) + " " + to_string(T) + " " + to_string(randnum(gen) ) + ".txt");
+
+            int threshold = 1;
             uniform_int_distribution<int> rand_m(0, m-1);
             uniform_int_distribution<int> rand_n(0, n-1);
             uniform_int_distribution<int> rand_bool(0, 1);
@@ -76,32 +79,27 @@ int main(int argc, char *argv[])
 
             double E = S(A,m,n);
             double M = sum(A,m,n);
-            double avg [4] = {0, 0, 0, 0};
-            double time = omp_get_wtime();
-            for (int k = 0; k < N; k++) {
+            for (int k = 1; k <= N; k++) {
                 for (int i = 0; i < m; i++) {
                     for (int j = 0; j < n; j++) {
                         int u = rand_m(gen);
                         int v = rand_n(gen);
-                        double dE = 2*(A[u][v]*A[u][mod(v+1,n)] + A[u][v]*A[mod(u+1, m)][v] +
-                                A[u][v]*A[u][mod(v-1 , n)] + A[u][v]*A[mod(u-1 , m)][v]);
-                        if (exp(-beta[l]*dE) > randouble(gen) ) {
+                        double dE = 2*A[u][v]*(A[u][mod(v+1,n)] + A[mod(u+1, m)][v] +
+                                 A[u][mod(v-1 , n)] +  A[mod(u-1 , m)][v]);
+                        if (exp(-beta*dE) > randouble(gen) ) {
                             A[u][v] = - A[u][v];
                             E += dE;
                             M += 2*A[u][v];
                         }
                     }
                 }
-                if (k >= samplepoint) {
-                    avg[0] += E;
-                    avg[1] += E*E;
-                    avg[2] += abs(M);
-                    avg[3] += M*M;
+                float tmp = round(( log(k) - mini )/ds);
+                if ( tmp > threshold || k == N-1) {
+                    outfile << k << ' ' << n << ' ' << T << ' ' << E << ' ' << M << endl;
+                    threshold = tmp;
                 }
             }
-            delete [] A;
-            # pragma omp critical
-            cout << 1/beta[l] << ' ' << omp_get_wtime() - time << ' ' << avg[0]/(N - samplepoint) << ' ' << avg[2]/(N - samplepoint) << ' '<< (avg[1]/(N - samplepoint) - pow(avg[0]/(N - samplepoint),2))*beta[l]*beta[l] << ' ' << (avg[3]/(N - samplepoint) - pow(avg[2]/(N - samplepoint),2))*beta[l] << ' ' <<  endl;
+        delete [] A;
+        outfile.close();
         }
-    }
 }

@@ -1,0 +1,31 @@
+from numpy import *
+import os
+files = os.listdir("/home/marius/Dokumenter/fys4150/attaboy/resources/")
+N = len(files)
+
+data = zeros((4,8*N,6))
+
+
+for i, f in zip(range(N), files):
+    tmp = loadtxt("/home/marius/Dokumenter/fys4150/attaboy/resources/" + f)
+    data[0, i*8:8*(i+1)] = tmp[0:8]/20**2
+    data[1, i*8:8*(i+1)] = tmp[8:16]/60**2
+    data[2, i*8:8*(i+1)] = tmp[16:24]/100**2
+    data[3, i*8:8*(i+1)] = tmp[24:32]/140**2
+
+keys = argsort(data[0,:,1])
+X = data[3,keys,5]
+T = data[0,keys,1]
+
+from matplotlib.pyplot import *
+
+plot(T,data[0,keys,5],T,data[1,keys,5],T,data[2,keys,5],T,data[3,keys,5])
+show()
+plot(T,data[0,keys,5],T,data[1,keys,5],T,data[2,keys,5],T,data[3,keys,5])
+show()
+plot(T,1./4*(data[0,keys,4]+data[1,keys,4]+data[2,keys,4]+data[3,keys,4]))
+show()
+plot(T,data[0,keys,3],T,data[1,keys,3],T,data[2,keys,3],T,data[3,keys,3])
+show()
+plot(T,data[0,keys,2],T,data[1,keys,2],T,data[2,keys,2],T,data[3,keys,2])
+show()

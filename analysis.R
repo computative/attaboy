@@ -41,3 +41,16 @@ plot(data$V13,data$V14 ,log="x")
 plot(data$V13,data$V15 ,log="x")
 # accept
 plot(data$V13,data$V16 ,log="x")
+
+
+
+variance = read.table("variance_temp2.400000.txt")
+
+
+
+
+A = variance$V1[sample(1:90000,size=8,replace=T)]
+X = table(cut(A, c(seq(min(A,B), max(A,B), (max(A,B) - min(A,B))/4))))
+O = table(cut(variance$V1, c(seq(min(A), max(A), (max(A) - min(A))/4))))
+P = O/sum(O)
+chisq.test(X, p=P)

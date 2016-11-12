@@ -1,0 +1,2 @@
+from numpy import *
+Ts = linspace(2,2.4,30)

@@ -8,10 +8,9 @@ def S(A):
             s += A[i,j]*A[i,(j+1) % (n)] + A[i,j]*A[(i+1) % (m),j]
     return -s
 
-m,n = 20, 20
-A = 2.*randint(0,2,size=(m,n))-1.
+m,n = 2, 2
 A = ones((m,n))
-N = 10000
+N = 10000000*10
 beta = 1
 
 avg = [0,0,0,0]
@@ -22,8 +21,8 @@ for k in range(N):
         for j in range(n):
             u = randint(0,m)
             v = randint(0,n)
-            dE = 2*(A[u,v]*A[u,(v+1) % n] + A[u,v]*A[(u+1) % m,v] + \
-                   A[u,v]*A[u,abs((v-1) % n)] + A[u,v]*A[abs((u-1) % m),v])
+            dE = 2*A[u,v]*(A[u,(v+1) % n] + A[(u+1) % m,v] + \
+                   A[u,abs((v-1) % n)] + A[abs((u-1) % m),v])
             if exp( -beta*dE ) > rand():
                 A[u,v] = -A[u,v]
                 E += dE
