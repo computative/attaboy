@@ -15,41 +15,39 @@
 \lstset{
   xleftmargin=.2\textwidth, xrightmargin=.2\textwidth
 }
-For a $2 \times 2$-grid of consisting of spin values $\pm 1$, it is straightforward to verify that the partition-function is given by
-\[
-Z(\beta) = 12 + 2\left( e^{ -8 J\beta} + e^{ 8 J\beta} \right)
-\]
-and thus the $n$-momentums of energy $E$ and magnetization $M$ are given by
-\[
-\E{E^n}(\beta) = \frac{2}{Z}\left( 8^n e^{ -8 J\beta} + (-8)^n e^{ 8 J\beta}  \right), \quad \E{M^n}(\beta) = \frac{1}{Z}\left( 4^n e^{ 8 J\beta} + 4(2)^n + 4(-2)^n + (-4)^n e^{ 8 J\beta}  \right)
-\]
-respectively. From these we obtain the expressions for expected energy and expected magnitude of magnetization 
-\[
-\E{E}(\beta) = \frac{2^4}{Z}\left( e^{ -8 J\beta} - e^{ 8 J\beta}  \right) \qquad \text{and} \qquad \E{|M|}(J\beta) = \frac{2^3}{Z}\left(  2 + e^{ 8 J\beta} \right).
-\]
-Use these, it is straight forward to compute the heat capacity at constant volume and magnetic susceptibility since they are
-\begin{align*}
-C_V &= \frac{1}{kT^2}\sigma_E^2 = \frac{2^7}{kT^2Z}\left[  \left( e^{ -8J\beta} + e^{ 8J\beta} \right) - \frac{2}{Z}\left( e^{ -8J\beta} - e^{ 8J\beta} \right)^2  \right] \\
-\chi &= \frac{1}{kT} \left(\E{M^2} -\E{|M|}^2 \right) = \frac{2^5}{kTZ} \left[ \left( 1 + e^{ 8J \beta} \right) - \frac{2}{Z}\left( 2 + e^{ 8J \beta} \right)^2 \right]
-\end{align*}
-\begin{table}
-\begin{tabular}{c l l l}
-&exact:					& numerical& Error at $10^8$ iterations\\
-$\E{E}$ & 7.9839301406925038		& 3.9945928& a\\
-$\E{|M|}$ & 3.9946429309943987		& -7.98379632& a\\
-$C_V$ & 0.12832932745714487	& 0.129378400754& a\\
-$\chi$ & 0.01604295806490974		& 0.0162110021882& a
-\end{tabular}
-\end{table}
+
+
 
 \section*{\uppercase{Introduction}}
 > I Motivate the reader, the first part of the introduction gives always a motivation and tries to give the overarching ideas\\
 > I What I have done\\
 > I The structure of the report, how it is organized etc
 \section*{\uppercase{Methods}}
-> I Describe the methods and algorithms\\
-> I You need to explain how you implemented the methods and also say something about the structure of your algorithm and present some parts of your code\\
-> I You should plug in some calculations to demonstrate your code, such as selected runs used to validate and verify your results. The latter is extremely important!! A reader needs to understand that your code reproduces selected benchmarks and reproduces previous results, either numerical and/or well-known closed form expressions.
+We used the Metropolis algorithm in conjunction with the Ising model to approximate the Boltzman distribution $P(E)$. The Metropolis algorithm works by constructing a Markov chain such that the stationary distribution is $P$ (Robert, Christian; Casella, George (2004). Monte Carlo Statistical Methods). We know that a Markov chain is defined by its transition distribution. We know that detailed balance(hva) and ergodicity(hva) are sufficient but (but not required conditions) for existance and uniqueness of stationary distribution respectively.
+
+Let's design a markov chain such that its stationary distripution is $P$. We will call this markov chain the Metropolis algorithm. We use the detailed balance criterion using P as the asymptotic distribution. This ensures that  the resulting markov chain will have P as an asymptotic distribution.
+\[
+p(i,j)P(j) = p(j,i)P(i) \qquad \text{only if} \qquad \frac{P(i)}{P(j)} = \frac{p(i,j)}{p(j,i)}
+\]
+Now pick any conditional distribution $g:\mathbb{R}^2 \to \mathbb{R}$ and a function $A: \mathbb{R}^2 \to \mathbb{R}$ such that
+\begin{equation}
+p(i,j) = g(i,j)A(i,j) \qquad \text{only if} \qquad \frac{A(i,j)}{A(j,i)} = \frac{P(i)}{P(j)} \frac{g(j,i)}{g(i,j)} \label{eq:mcchain}
+\end{equation}
+Clearly, by fixing the transformation rules of $A$ and $g$ one uniquely defines $p$ since $p$ is the pointwise product of $A$ with $g$. Let $g$ be any function on $\mathbb{R}^2$ with non-compact support, and define $A$ by
+\begin{equation}
+A(i,j) = \min \left( 1, \frac{P(i)}{P(j)} \frac{g(j,i)}{g(i,j)} \right),
+\end{equation}
+which solves equation \eqref{eq:mcchain} (check yourself!). This is the selection rule for the Metropolis algorithm as you will find implemented in this project.\\
+\\
+And sinec this markov chain is ergodic (Hjorth jensen), $P$ is the only stationary distribution of of $p$ (Robert, Christian; Casella, George (2004). Monte Carlo Statistical Methods). Let us consider how this is implemented in the case of the Ising model, where $A(i,j)/A(j,i)$ is taken to be the Boltzman factor.\\
+\\
+In this project we assume we are working with a sequence of $L \times L$ matrices $M_n$ where the elements $m_{u,v}$ are either $1$ or $-1$. Let $J$ be some real number, we assign a quantity called the energy denoted by $E$ which is computed by
+\begin{equation}
+E_n = -J \sum_{(i,j) \in S_L^2} (m_{ij} m_{i(j+1 \ \mathrm{mod} \ L)} + m_{ij} m_{(i+1 \ \mathrm{mod} \ L)j}), \label{energy}
+\end{equation}
+letting $S_L^2 = \big\{ (u,v) \in \{1,\cdots, L \}\times\{1,\cdots, L \} \big\}$, this ensures the sum in \eqref{energy} is over neighbouring elements of the matrix $M$ with periodic boundary conditions. We take the target distribution $P$ for the Metropolis algorithm to be the Boltzmann distribution. Hence $P(i) = (1/Z) e^{ -\beta E_i}$, for $\beta = (k_B T)^{  -1}$ and $k_B$ the Boltzmann constant. We let $g(i,j)$ be the unknown function induced by by the selection rule $A$ and Boltzmann factor when we flip one spin at a time. Bla bla\\
+\\
+The algorithm was implemented in c++ by:
 \begin{lstlisting}[language=c++]
 for (int k = 0; k < N; k++) { // sample iterations
     for (int i = 0; i < m; i++) { // loop matrix cols  
@@ -77,9 +75,74 @@ for (int k = 0; k < N; k++) { // sample iterations
     }
 }
 \end{lstlisting}
+We computed the exact result for $L=2$ and compared them to the numerical results. The errors were reasonable, indicating that the algorithm was implemented correctly (see table \ref{tab:errors}). The expressions for the exact results will be presented in the results.\\
+\\
+We would like to know when we have reached the asymptotic distribution $P$. Since we want to compute observables, this is useful because this ensures  that we know we are sampling to our expectation values from the Boltzmann distribution at any given confidence level. To test this, we will use a conventional $\chi^2$ statistical goodness-of-fit-test for the null hypothesis $H_0:$ $P(i)$ is the asymptotic distribution against $H_a:$ $P(i)$ is not the asymptotic distribution. The first markov iteration for which this is the case should be taken as the sampling point, because then we know that we are sampling from the Boltzmann distribution. We test this by at each step $n$ by assembling the asymptotic distribution by bootstrapping (Berk Devoire) and drawing samples from the empirical distribution at step $n$. We gather data by simulating $N$ times using the Metropolis algorithm. We let the algorithm continue for a long time, typically $10^6$ or $10^7$ Montecarlo cycles. We do this to ensure that the asnymptotic distribution is the Boltzman distribution. We store the measured energies at each monte carlo cycle $n$ for all the $N$ simulations. This means we have typically $10^6$ or $10^7$ candidates to the asymptotic distribution (the boltzmanm distribution). Since we did exactly $N$ simulations, we have $N$ observation from the candidates to the asymptotic distribution at each $n$. Each of these candidates are compared to asymptotic distribution. There exist statistical tests which can be used to determine when the sample is drawn from the asymptotic distribution for each $n$ at any confidence level $\alpha$. The most common is the chi-square goodness-of-fit test, which works as follows: At each $n$, divide cut the domain of the empirical distribution into $k$ intervals $I_j$ such that there are at least 5 observations in $I_j$ for all $j$. Count the number of observation in each interval, and label it by $n_j$. Then compute the probability of an observation to fall into $I_j$ from the empirical distribution. Call this probability $p_j$. It can be shown using the center limit theorem of dependent stochastic that the following observable has a known distribution:
+\[
+X^2 = \sum_{j=1}^k \frac{(n_j - np_j )^2}{np_j}.
+\]
+The distribution is the $\chi^2_\nu$-distribution with $\nu$ degrees of freedom, where $\nu = k-1$ under the null hypothesis that the empirical distribution is equal to the empirical. In the case that the null-hypothesis is false, the value of $X^2$ will be large, and when the value of $X^2$ is larger than the $\chi^2_{\nu, 1-\alpha}$-quantile in the $\chi^2$-distribution, we know that the distributions are difference at confidence level $\alpha$. We chose a confidence level of $0.5$, which implies we will only accept distributions which are so similar to the asymptotic distribution, that the probability of evaluating a distribution violating the null more hypothesis more strongly is exactly 50\%.
 \section*{\uppercase{Results and discussion}}
+\begin{table}[!h]
+\center
+\begin{tabular}{c l l l}
+Observable&Exact:					& Numerical, $n = 10^8$& Error\\
+\hline
+$\E{E}$ & -7.9839283437467596		& -7.98379632& $-1.3\cdot 10^{-4}$\\
+$\E{|M|}$ & 3.9946429309943987		& 3.9945928& $5.0\cdot 10^{-5}$\\
+$C_V$ & 0.12832932745714487	& 0.129378400754& $-1.0\cdot 10^{-3}$\\
+$\chi$ & 0.01604295806490974		& 0.0162110021882& $-1.7\cdot 10^{-4}$
+\end{tabular}
+\caption{BLa bla} \label{tab:errors}
+\end{table}
+
+\begin{figure}
+\center
+\input{sampling.tex}
+\caption{Subfigure (a) displays variance of the empirical distribution as a function of iteration number $n$. The variance arrives at a steady state at the point marked by the dashed line. This is the point where the Goodness of fit tests reaches confidence level $\alpha=5\%$. (b) The $p$-values of the $\chi^2$-test notices that steady state has been reached and shifts from low to high at confidence level $\alpha=5\%$. (c) The steady asymptotic distribution at $n = 10^6$. This is the Boltzmann distribution. (d) The empirical distribution at confidence level $\alpha=5\%$ marked by the dashed line. Notice that the empirical distribution is similar to the asymptotic distribution at this point, justifying using the confidence level $\alpha$ as sampling point. We argue that using the sampling point minimizes computation times and maximized accuracy since we are always sampling from the asymptotic distribution.}
+\end{figure}
+
+
+\begin{figure}
+\center
 \input{obs1.pgf}\\
 \input{obs2.pgf}
+\caption{Observables plotted against thermal energy for exactly three values of $L$. The solid line represent observables at $L=140$, whilst the dotted, dashed and double-dot-dashed lines represent $L = 100,60.20$ respectively.}
+\end{figure}
+
+
+\begin{table}
+\center
+\begin{tabular}{l l l l l l l}
+$L$ & \multicolumn{5}{c}{$k_BT$}\\
+		&2			&2.1	&2.2	&2.3	&2.4\\
+\hline
+20  	&$2.7\cdot 10^2$	&				&				&				&$1.3\cdot 10^1$\\
+60		&$5.3\cdot 10^3$	&				&				&				&$9.0\cdot 10^1$\\
+100		&$1.7\cdot 10^4$	&				&				&				&$8.3\cdot 10^1$\\
+140		&$1.3\cdot 10^5$	&				&				&				&$1.2\cdot 10^2$
+\end{tabular}
+\caption{Points where $p > \alpha$, choses sampling points} \label{tab:samplingpointsm	}
+\end{table}
+
+For a $2 \times 2$-grid of consisting of spin values $\pm 1$, it is straightforward to verify that the partition-function is given by
+\[
+Z(\beta) = 12 + 2\left( e^{ -8 J\beta} + e^{ 8 J\beta} \right)
+\]
+and thus the $n$-momentums of energy $E$ and magnetization $M$ are given by
+\[
+\E{E^n}(\beta) = \frac{2}{Z}\left( 8^n e^{ -8 J\beta} + (-8)^n e^{ 8 J\beta}  \right), \quad \E{M^n}(\beta) = \frac{1}{Z}\left( 4^n e^{ 8 J\beta} + 4(2)^n + 4(-2)^n + (-4)^n e^{ 8 J\beta}  \right)
+\]
+respectively. From these we obtain the expressions for expected energy and expected magnitude of magnetization 
+\[
+\E{E}(\beta) = \frac{2^4}{Z}\left( e^{ -8 J\beta} - e^{ 8 J\beta}  \right) \qquad \text{and} \qquad \E{|M|}(J\beta) = \frac{2^3}{Z}\left(  2 + e^{ 8 J\beta} \right).
+\]
+Use these, it is straight forward to compute the heat capacity at constant volume and magnetic susceptibility since they are
+\begin{align*}
+C_V &= \frac{1}{kT^2}\sigma_E^2 = \frac{2^7}{kT^2Z}\left[  \left( e^{ -8J\beta} + e^{ 8J\beta} \right) - \frac{2}{Z}\left( e^{ -8J\beta} - e^{ 8J\beta} \right)^2  \right] \\
+\chi &= \frac{1}{kT} \left(\E{M^2} -\E{|M|}^2 \right) = \frac{2^5}{kTZ} \left[ \left( 1 + e^{ 8J \beta} \right) - \frac{2}{Z}\left( 2 + e^{ 8J \beta} \right)^2 \right]
+\end{align*}
+
 > I Present your results\\
 > I Give a critical discussion of your work and place it in the correct context.\\
 > I Relate your work to other calculations/studies\\
