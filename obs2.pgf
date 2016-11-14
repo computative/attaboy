@@ -567,7 +567,7 @@
 \pgftext[x=2.967626in,y=0.434277in,,top]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont 2.4}}%
 \end{pgfscope}%
 \begin{pgfscope}%
-\pgftext[x=1.756535in,y=0.229166in,,top]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont \(\displaystyle k_bT\)   [ \(\displaystyle J\) ]}}%
+\pgftext[x=1.756535in,y=0.229166in,,top]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont \(\displaystyle k_bT\)\quad[ \(\displaystyle J\) ]}}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgfsetbuttcap%
@@ -816,7 +816,7 @@
 \pgftext[x=0.489889in,y=2.148139in,right,]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont 3.0}}%
 \end{pgfscope}%
 \begin{pgfscope}%
-\pgftext[x=0.229166in,y=1.318986in,,bottom,rotate=90.000000]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont \(\displaystyle \chi\)   [ \(\displaystyle \cdot\) ]}}%
+\pgftext[x=0.229166in,y=1.318986in,,bottom,rotate=90.000000]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont \(\displaystyle \chi\)\quad[ \(\displaystyle \cdot\) ]}}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgftext[x=1.756535in,y=2.217583in,,base]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont Magnetic succeptability vs thermal energy}}%
@@ -1303,7 +1303,7 @@
 \pgftext[x=6.227972in,y=0.434277in,,top]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont 2.4}}%
 \end{pgfscope}%
 \begin{pgfscope}%
-\pgftext[x=5.016881in,y=0.229166in,,top]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont \(\displaystyle k_BT\)   [  \(\displaystyle J\) ]}}%
+\pgftext[x=5.016881in,y=0.229166in,,top]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont \(\displaystyle k_BT\)\quad[ \(\displaystyle J\) ]}}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgfsetbuttcap%
@@ -1593,7 +1593,7 @@
 \pgftext[x=3.750235in,y=2.148139in,right,]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont 300}}%
 \end{pgfscope}%
 \begin{pgfscope}%
-\pgftext[x=3.456207in,y=1.318986in,,bottom,rotate=90.000000]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont \(\displaystyle C_V\)   [ \(\displaystyle \cdot\) ]}}%
+\pgftext[x=3.456207in,y=1.318986in,,bottom,rotate=90.000000]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont \(\displaystyle C_V/k_B\)\quad[ \(\displaystyle \cdot\) ]}}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgftext[x=5.016881in,y=2.217583in,,base]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont Heat capacity vs thermal energy}}%

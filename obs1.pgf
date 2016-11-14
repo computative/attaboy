@@ -478,7 +478,7 @@
 \pgftext[x=3.124375in,y=0.434277in,,top]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont 2.4}}%
 \end{pgfscope}%
 \begin{pgfscope}%
-\pgftext[x=1.893118in,y=0.229166in,,top]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont \(\displaystyle k_bT\)   [ \(\displaystyle J\) ]}}%
+\pgftext[x=1.893118in,y=0.229166in,,top]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont \(\displaystyle k_bT\)\quad[ \(\displaystyle J\) ]}}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgfsetbuttcap%
@@ -768,7 +768,7 @@
 \pgftext[x=0.606305in,y=2.148139in,right,]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont −1.2}}%
 \end{pgfscope}%
 \begin{pgfscope}%
-\pgftext[x=0.229166in,y=1.318986in,,bottom,rotate=90.000000]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont \(\displaystyle \langle E \rangle\)   [ \(\displaystyle \cdot\) ]}}%
+\pgftext[x=0.229166in,y=1.318986in,,bottom,rotate=90.000000]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont \(\displaystyle \langle E \rangle\)\quad[ \(\displaystyle \cdot\) ]}}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgftext[x=1.893118in,y=2.217583in,,base]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont Energy vs thermal energy}}%
@@ -1242,7 +1242,7 @@
 \pgftext[x=6.227972in,y=0.434277in,,top]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont 2.4}}%
 \end{pgfscope}%
 \begin{pgfscope}%
-\pgftext[x=4.996715in,y=0.229166in,,top]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont \(\displaystyle k_BT\)   [  \(\displaystyle J\) ]}}%
+\pgftext[x=4.996715in,y=0.229166in,,top]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont \(\displaystyle k_BT\)\quad[  \(\displaystyle J\) ]}}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgfsetbuttcap%
@@ -1491,7 +1491,7 @@
 \pgftext[x=3.709903in,y=2.148139in,right,]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont 1.0}}%
 \end{pgfscope}%
 \begin{pgfscope}%
-\pgftext[x=3.449180in,y=1.318986in,,bottom,rotate=90.000000]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont \(\displaystyle \langle |M| \rangle\)   [ \(\displaystyle \cdot\) ]}}%
+\pgftext[x=3.449180in,y=1.318986in,,bottom,rotate=90.000000]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont \(\displaystyle \langle |M| \rangle\)\quad[ \(\displaystyle \cdot\) ]}}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgftext[x=4.996715in,y=2.217583in,,base]{{\rmfamily\fontsize{11.000000}{13.200000}\selectfont Magnetization vs thermal energy}}%

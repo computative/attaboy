@@ -1,7 +1,8 @@
 library(mgcv)
 
+t = "2T1"
 ################
-data = read.table("../resources/20_2T4.txt",col.names=c("n","E"))
+data = read.table(paste("../resources/20_", t, ".txt", sep=""),col.names=c("n","E"))
 ns = as.numeric(names(table(data$n)))
 tmp = rep(0,length(ns))
 tmp2 = rep(0,length(ns))
@@ -27,7 +28,7 @@ plot(ns,pred$fit, type="l", log ="x", ylim = c(0,1))
 ns[which( as.numeric( tmp2 ) > 0.05 )[1]]
 
 ################
-data = read.table("../resources/60_2T4.txt",col.names=c("n","E"))
+data = read.table(paste("../resources/60_", t, ".txt", sep=""),col.names=c("n","E"))
 ns = as.numeric(names(table(data$n)))
 tmp = rep(0,length(ns))
 tmp2 = rep(0,length(ns))
@@ -56,12 +57,12 @@ ns[which( as.numeric( tmp2 ) > 0.05 )[1]]
 #################
 
 
-data = read.table("../resources/100_2T4.txt",col.names=c("n","E"))
+data = read.table(paste("../resources/100_", t, ".txt", sep=""),col.names=c("n","E"))
 ns = as.numeric(names(table(data$n)))
 tmp = rep(0,length(ns))
 tmp2 = rep(0,length(ns))
 target = data[data$n > 100000,]$E
-g = 24
+g = 10
 cats = seq(min(target) , max(target), (max(target) - min(target) )/g )
 groups = cut(target, breaks = g)
 P = as.numeric(table( groups ))/length(target)
@@ -84,7 +85,7 @@ ns[which( as.numeric( tmp2 ) > 0.05 )[1]]
 
 ##############
 
-data = read.table("../resources/140_2T4.txt",col.names=c("n","E"))
+data = read.table(paste("../resources/140_", t, ".txt", sep=""),col.names=c("n","E"))
 ns = as.numeric(names(table(data$n)))
 tmp = rep(0,length(ns))
 tmp2 = rep(0,length(ns))
