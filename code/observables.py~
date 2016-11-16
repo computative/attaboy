@@ -1,9 +1,0 @@
-from numpy import *
-
-data = loadtxt("biggdat.txt")
-
-from matplotlib.pyplot import *
-
-T = data[:,0]
-plot(T, data[:,1], T, data[:,2],T, data[:,3],T, data[:,4])
-show()

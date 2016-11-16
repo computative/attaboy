@@ -1,5 +1,7 @@
 from numpy import *
-data = loadtxt("biggdat.txt")
+
+data = loadtxt("../resources/biggdat.txt")
+
 T = data[:,0]
 Tc = array([0.,0.,0.,0.])
 L  = array([20.,60.,100.,140.])

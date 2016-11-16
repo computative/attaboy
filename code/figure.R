@@ -22,7 +22,7 @@ fit = gam(tmp2 ~ s(ns, fx=FALSE, k=-1, bs="cr"), family = binomial(link="logit")
 pred = predict(fit, newdata=data.frame("ns"=ns), se=TRUE, type="response")
 
 library(tikzDevice)
-tikz("/home/marius/Dokumenter/fys4150/attaboy/sampling.tex", width = 1.6*4, height = 1.6/3*3, pointsize=11)
+tikz("../benchmark/sampling.tex", width = 1.6*4, height = 1.6/3*3, pointsize=11)
 par(mfrow=c(1,4))
 par(ps=8, cex=1, cex.main=1.25, cex.lab=1.25, cex.sub=1, cex.axis=1.25, font.main=1)
 
