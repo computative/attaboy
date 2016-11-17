@@ -1,0 +1,10 @@
+Running:
+
+~$ python 2x2numerical.py
+
+Prints:
+
+Energy: -7.982312
+Magn: 3.994092
+Cv: 0.141191134656
+X: 0.017725095536

@@ -1,0 +1,12 @@
+Running:
+
+$ python single.py
+
+Produces image files "single.png" and "single.pgf" containing 4x2 plots of the result of a single Markov chain simulation and for reference prints:
+
+Iteration time: 1276.57
+Iteration time: 1239.09
+Iteration time: 1266.83
+Iteration time: 1269.57
+Boltzmann (T = 1.0) variance: 9.56516735802
+Boltzmann (T = 2.4) variance: 3182.54167778

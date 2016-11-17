@@ -21,6 +21,6 @@ for i in range(4):
             a[i][j] = 0
 a = sum(a)
 
-print 2./log(1 + 2**.5)
-print sum((Tc - a*L**-1)/4)
-print 2./log(1 + 2**.5) - sum((Tc - a*L**-1)/4)
+print "Exact:", 2./log(1 + 2**.5)
+print "Estimate:", sum((Tc - a*L**-1)/4)
+print "Error", 2./log(1 + 2**.5) - sum((Tc - a*L**-1)/4)

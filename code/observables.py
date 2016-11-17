@@ -69,8 +69,8 @@ ax[1][1].set_title(ur"Heat capacity vs thermal energy",fontsize=11)
 
 
 plt.tight_layout(0.5)
-plt.savefig("../benchmark/obs3.pgf")
-plt.savefig("../benchmark/obs3.png")
+plt.savefig("../benchmark/observables.pgf")
+plt.savefig("../benchmark/observables.png")
 
 
 

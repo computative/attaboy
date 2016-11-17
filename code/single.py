@@ -1,8 +1,8 @@
-
 # -*- coding: utf-8 -*-
 from numpy import *
 from numpy.linalg import *
 from numpy.fft import *
+from time import sleep
 
 import matplotlib as mpl
 mpl.use("pgf")
@@ -33,7 +33,7 @@ y = zeros((I, 2, 2, 3, I))
 x = zeros((I, 2, 2, I))
 betas = [1/1., 1/2.4]
 As = [0,1]
-N = 1e5
+N = 1e7
 
 Ns = logspace(1,log10(N),500, dtype=int)
 distr = zeros( ( 2*(N-1000),2) )
@@ -45,7 +45,7 @@ for j in range(len(betas)):
     for k in range(len(As)):
         beta,A0 = betas[j], As[k] # A0 = 1 random matrix
         A = popen("./research.x %i %f %i" % (N,beta,A0) )
-        print A.readlines()
+        print "Iteration time:", A.readlines()[0].strip("\n")
         tmp = zeros((N,3))
 
         infile = open("temp.txt")
@@ -70,8 +70,8 @@ for j in range(len(betas)):
 f, ax = plt.subplots(4,2,figsize=(2*0.8*4,3.4*0.8*3))
 
 
-print var(distr[:,0]), var(distr[:,0])/20**2
-print var(distr[:,1]), var(distr[:,1])/2.4**2/20**2
+print "Boltzmann (T = 1.0) variance:" , var(distr[:,0])
+print "Boltzmann (T = 2.4) variance:" , var(distr[:,1])
 
 ax[0,0].semilogx(Ns,Es[:,0,0],'k')
 ax[0,0].semilogx(Ns,Es[:,0,1],'k', dashes=[2,2])
@@ -120,5 +120,5 @@ ax[3,1].set_xlabel(ur"$E$\quad[ $J$ ]")
 ax[3,1].set_ylabel(ur"P(E)")
 
 plt.tight_layout(0.5)
-plt.savefig("../benchmark/2020.pgf")
-plt.savefig("../benchmark/2020.png")
+plt.savefig("../benchmark/single.pgf")
+plt.savefig("../benchmark/single.png")

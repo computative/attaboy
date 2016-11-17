@@ -1,0 +1,9 @@
+Running:
+
+$ python estimator.py
+
+Prints:
+
+Exact: 2.26918531421
+Estimate: 2.27017857143
+Error -0.000993257215549

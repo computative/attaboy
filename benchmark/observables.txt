@@ -1,0 +1,5 @@
+Running:
+
+$ python observables.py
+
+Saves two image files: observables.pgf, observables.png to the benchmark directory containing 2x2 plots of the quantities <E>, <M>, Cv and X as a function of T
